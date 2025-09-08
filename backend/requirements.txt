@@ -1,0 +1,14 @@
+﻿Flask==3.0.3
+flask-cors==4.0.1
+pandas==2.2.2
+numpy==1.26.4
+gensim==4.3.3
+pyLDAvis==3.4.1
+pyarrow==17.0.0
+scikit-learn==1.5.1
+nltk==3.9.1
+networkx==3.3
+python-louvain==0.16
+plotly==5.24.1
+spacy==3.7.5
+office365-rest-python-client==2.5.11

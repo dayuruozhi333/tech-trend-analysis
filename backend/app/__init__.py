@@ -1,0 +1,7 @@
+﻿from flask import Flask
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
+
+from .api import routes  # noqa: F401

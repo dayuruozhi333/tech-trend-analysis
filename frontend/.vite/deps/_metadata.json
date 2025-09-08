@@ -1,0 +1,40 @@
+{
+  "hash": "1829acd6",
+  "configHash": "1b54c093",
+  "lockfileHash": "b189f4c3",
+  "browserHash": "e700efe8",
+  "optimized": {
+    "plotly.js-dist-min": {
+      "src": "../../node_modules/plotly.js-dist-min/plotly.min.js",
+      "file": "plotly__js-dist-min.js",
+      "fileHash": "8cf86965",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "0c0c823f",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "bde113a5",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "22c2c699",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-JCH2SJW3": {
+      "file": "chunk-JCH2SJW3.js"
+    },
+    "chunk-BUSYA2B4": {
+      "file": "chunk-BUSYA2B4.js"
+    }
+  }
+}
