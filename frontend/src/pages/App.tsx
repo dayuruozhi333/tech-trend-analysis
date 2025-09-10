@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { getTopics, getTrends, getTopicYearDetail, Topic, Trends, TopicYearDetail } from '../services/api';
+import { AIAnalysis } from '../components/AIAnalysis';
 
 // 中文说明：
 // - 本页面集成：健康检查、主题列表、趋势折线图、pyLDAvis 内嵌
@@ -163,16 +164,22 @@ export const App: React.FC = () => {
             <section>
               {!selectedTopicId && <h2>主题列表</h2>}
               {!selectedTopicId && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
-                  {topics.map(t => (
-                    <button key={t.id} onClick={() => setSelectedTopicId(t.id)} style={{ textAlign: 'left', border: '1px solid #ddd', borderRadius: 8, padding: 12, background: '#fff', cursor: 'pointer' }}>
-                      <div style={{ fontWeight: 600, marginBottom: 8 }}>{t.id}. {t.label}</div>
-                      <div style={{ fontSize: 12, color: '#555' }}>
-                        {t.topTerms.slice(0, 6).map(tt => tt.term).join(' · ')}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+                    {topics.map(t => (
+                      <button key={t.id} onClick={() => setSelectedTopicId(t.id)} style={{ textAlign: 'left', border: '1px solid #ddd', borderRadius: 8, padding: 12, background: '#fff', cursor: 'pointer' }}>
+                        <div style={{ fontWeight: 600, marginBottom: 8 }}>{t.id}. {t.label}</div>
+                        <div style={{ fontSize: 12, color: '#555' }}>
+                          {t.topTerms.slice(0, 6).map(tt => tt.term).join(' · ')}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <AIAnalysis
+                    content={topics.map(t => `${t.id}. ${t.label}\n关键词: ${t.topTerms.slice(0, 6).map(tt => tt.term).join(' · ')}`).join('\n\n')}
+                    type="topics"
+                  />
+                </>
               )}
               {selectedTopicId && trends && !selectedTopicYearDetail && (
                 <div>
@@ -186,6 +193,10 @@ export const App: React.FC = () => {
                     trends={trends}
                     topicId={selectedTopicId}
                     onPointClick={(topicId, year) => setSelectedTopicYearDetail({ topicId, year })}
+                  />
+                  <AIAnalysis
+                    content={`主题: ${topics.find(t => t.id === selectedTopicId)?.label || `主题 ${selectedTopicId}`}\n\n年度趋势数据:\n${trends.years.map((year, index) => `${year}: ${trends.topics.find(t => t.id === selectedTopicId)?.series[index]?.toFixed(3) || '0'}`).join('\n')}`}
+                    type="trends"
                   />
                 </div>
               )}
@@ -206,6 +217,10 @@ export const App: React.FC = () => {
                     </button>
                   </div>
                   <TopicYearDetailView detail={topicYearDetail} />
+                  <AIAnalysis
+                    content={`主题详情分析:\n主题: ${topicYearDetail.label}\n年份: ${topicYearDetail.year}\n文献数量: ${topicYearDetail.docCount}\n\n关键词分布:\n${topicYearDetail.terms.slice(0, 10).map(term => `${term.term}: ${term.percent.toFixed(1)}%`).join('\n')}`}
+                    type="general"
+                  />
                 </div>
               )}
             </section>
@@ -214,11 +229,17 @@ export const App: React.FC = () => {
             <section>
               <h2>年度趋势</h2>
               {trends && (
-                <InteractiveTrends
-                  trends={trends}
-                  colors={colors}
-                  onPointClick={(topicId, year) => setSelectedTopicYearDetail({ topicId, year })}
-                />
+                <>
+                  <InteractiveTrends
+                    trends={trends}
+                    colors={colors}
+                    onPointClick={(topicId, year) => setSelectedTopicYearDetail({ topicId, year })}
+                  />
+                  <AIAnalysis
+                    content={`年度趋势分析:\n\n各主题发展趋势:\n${trends.topics.map(topic => `${topic.id}. ${topic.label}\n${trends.years.map((year, index) => `${year}: ${topic.series[index]?.toFixed(3) || '0'}`).join(', ')}`).join('\n\n')}`}
+                    type="trends"
+                  />
+                </>
               )}
             </section>
           )}
@@ -253,6 +274,10 @@ export const App: React.FC = () => {
                   borderRadius: 8
                 }}
                 title="pyLDAvis"
+              />
+              <AIAnalysis
+                content={`主题关系地图分析:\n\n主题分布和关系:\n${topics.map(t => `${t.id}. ${t.label}\n关键词: ${t.topTerms.slice(0, 5).map(tt => tt.term).join(', ')}`).join('\n\n')}\n\n注: 此分析基于pyLDAvis生成的多维主题关系图，展示了各主题在语义空间中的位置和关联性。`}
+                type="map"
               />
             </section>
           )}

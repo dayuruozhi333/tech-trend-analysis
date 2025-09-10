@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "tech-trend-frontend",
   "private": true,
   "version": "0.1.0",
@@ -9,10 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "fflate": "0.8.2",
+    "plotly.js-dist-min": "2.35.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "fflate": "0.8.2",
-    "plotly.js-dist-min": "2.35.2"
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@types/react": "18.3.3",

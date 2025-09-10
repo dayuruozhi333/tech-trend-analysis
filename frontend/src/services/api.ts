@@ -48,3 +48,25 @@ export async function getTopicYearDetail(topicId: number, year: number): Promise
   if (!res.ok) throw new Error('Failed to fetch topic-year detail');
   return res.json();
 }
+
+// AI分析相关类型和函数
+export type AIAnalysisRequest = {
+  content: string;
+  type: 'topics' | 'trends' | 'map' | 'general';
+};
+
+export async function requestAIAnalysis(request: AIAnalysisRequest): Promise<ReadableStream<Uint8Array> | null> {
+  const res = await fetch(`${apiBase}/ai-analysis`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to request AI analysis');
+  }
+
+  return res.body;
+}
