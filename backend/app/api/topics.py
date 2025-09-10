@@ -69,11 +69,7 @@ def pyldavis_page():
 
 @app.get('/api/vis/pyldavis_cn')
 def pyldavis_page_cn():
-    """返回“中文本地化 + 图例”的 pyLDAvis HTML。
-
-    - 将常见英文 UI 文案替换为中文
-    - 基于服务层的前 15 个主题，注入一份图例列表，确保分类与 15 个主题一一对应
-    """
+    """返回直接替换为中文的 pyLDAvis HTML。"""
     svc = TopicService.get_instance()
     fp = svc.get_pyldavis_path()
     import os
@@ -84,25 +80,20 @@ def pyldavis_page_cn():
     with open(fp, 'r', encoding='utf-8') as f:
         html = f.read()
 
-    # 基础文本替换（仅替换出现概率高的固定文案，不影响交互脚本）
+    # 直接替换HTML中的英文文本
     replacements = {
         'Selected Topic:': '选择主题：',
+        'Selected Topic': '选择主题',
         'Previous Topic': '上一个主题',
         'Next Topic': '下一个主题',
         'Clear Topic': '清除选择',
         'Intertopic Distance Map (via multidimensional scaling)': '主题间距离图（多维尺度分析）',
         'Slide to adjust relevance metric:': '拖动以调整相关性指标：',
         'Top-30 Most Salient Terms': '最显著术语 Top-30',
+        'Most Salient Terms': '最显著术语',
         'Most Relevant Terms': '最相关术语',
         'Overall Term Frequency': '整体术语频率',
         'Term Relevance': '术语相关性',
-    }
-    for k, v in replacements.items():
-        html = html.replace(k, v)
-
-    # 进一步覆盖/补充更多内置英文文案
-    extra_replacements = {
-        'Selected Topic': '选择主题',
         'Marginal topic distribution': '主题边际分布',
         'Estimated term frequency within the selected topic': '所选主题内的估计词频',
         'Overall term frequency': '整体词频',
@@ -112,46 +103,34 @@ def pyldavis_page_cn():
         'see Sievert & Shirley (2014)': '参考 Sievert 与 Shirley (2014)',
         'PC1': '主成分1',
         'PC2': '主成分2',
-        'λ = 1': 'λ = 1',  # 保持符号
+        'λ = 1': 'λ = 1',
     }
-    for k, v in extra_replacements.items():
+    
+    # 进行文本替换
+    for k, v in replacements.items():
         html = html.replace(k, v)
 
-    # 注入 DOM 级别翻译脚本，处理由 JS 动态插入的英文文案
-    translate_script = (
-        """
-<script>(function(){
+    # 注入简单的中文翻译脚本
+    translate_script = """
+<script>
+(function(){
   function replaceTextInNode(node, mapping){
     if(node.nodeType === Node.TEXT_NODE){
       var text = node.nodeValue;
       if(!text) return;
       Object.keys(mapping).forEach(function(k){
         var v = mapping[k];
-        try{
-          // 精确匹配与常见变体（去除前后空格）
-          if(text.trim() === k){ node.nodeValue = text.replace(k, v); }
-          text = node.nodeValue;
+        if(text.indexOf(k) !== -1){
           node.nodeValue = text.split(k).join(v);
-        }catch(e){}
-      });
-    } else if(node.nodeType === Node.ELEMENT_NODE){
-      // 替换常见控件的 value/aria-label/title
-      var el = node;
-      ['value','title','aria-label'].forEach(function(attr){
-        if(el.hasAttribute && el.hasAttribute(attr)){
-          var val = el.getAttribute(attr);
-          if(val){
-            Object.keys(window.__PYLDAVIS_CN_MAP__).forEach(function(k){
-              el.setAttribute(attr, val.split(k).join(window.__PYLDAVIS_CN_MAP__[k]));
-            });
-          }
         }
       });
+    } else if(node.nodeType === Node.ELEMENT_NODE){
       for(var i=0;i<node.childNodes.length;i++){
         replaceTextInNode(node.childNodes[i], mapping);
       }
     }
   }
+  
   function translate(){
     var mapping = {
       'Selected Topic:': '选择主题：',
@@ -169,20 +148,21 @@ def pyldavis_page_cn():
       'PC1': '主成分1',
       'PC2': '主成分2'
     };
-    window.__PYLDAVIS_CN_MAP__ = mapping;
     replaceTextInNode(document.body, mapping);
   }
+  
   if(document.readyState === 'complete' || document.readyState === 'interactive'){
-    setTimeout(translate, 0);
+    setTimeout(translate, 100);
   } else {
-    document.addEventListener('DOMContentLoaded', translate);
+    document.addEventListener('DOMContentLoaded', function(){
+      setTimeout(translate, 100);
+    });
   }
-  // 监听滑块等交互后 DOM 变化
-  var obs = new MutationObserver(function(){ translate(); });
-  obs.observe(document.documentElement, { childList: true, subtree: true });
-})();</script>
-        """
-    )
+})();
+</script>
+"""
+    
+    # 插入翻译脚本
     insert_pos = html.rfind('</body>')
     if insert_pos != -1:
         html = html[:insert_pos] + translate_script + html[insert_pos:]
