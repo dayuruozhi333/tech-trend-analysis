@@ -102,7 +102,7 @@ def call_modelscope_api(prompt):
         # 使用正确的ModelScope API端点（OpenAI兼容接口）
         api_url = "https://api-inference.modelscope.cn/v1/chat/completions"
         headers = {
-            'Authorization': 'Bearer ms-e03db55d-e68f-4e0f-abbd-f136b02103f1',
+            'Authorization': 'Bearer ms-09718931-e4a9-437d-b6b9-404c18b8a9c5',
             'Content-Type': 'application/json'
         }
         
