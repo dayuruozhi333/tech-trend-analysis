@@ -22,3 +22,4 @@ python start/start.py
 - 当前端就绪后，自动打开浏览器跳转到 `http://localhost:5173`
 
 注意：需要本地已安装 Python 3.10+ 与 Node.js（含 npm）。
+·
