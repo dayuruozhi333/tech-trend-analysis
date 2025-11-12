@@ -12,16 +12,22 @@ from ..services.topic_service import TopicService
 
 @app.get('/api/topics')
 def list_topics():
-    """返回所有主题的基本信息（ID、标签、Top 关键词）。"""
+    """返回所有主题的基本信息（ID、标签、Top 关键词、代表学者、主题说明）。"""
     svc = TopicService.get_instance()
     topics = svc.get_topics()
     # 注意：服务层 get_topics() 已返回 0-based id。这里保持与 /trends 一致：1 起始
     data = []
     for t in topics:
+        # 获取代表学者（使用0-based的topic_id）
+        representative_authors = svc.get_topic_representative_authors(t.id, top_n=5)
+        # 获取主题说明
+        description = svc.get_topic_description(t.id)
         data.append({
             'id': t.id + 1,
             'label': t.label,
             'topTerms': t.top_terms,
+            'representativeAuthors': representative_authors,
+            'description': description,
         })
     return jsonify(data)
 
@@ -52,6 +58,62 @@ def topic_year_detail(topic_id: int, year: int):
         data = svc.get_topic_year_detail(topic_id, year)
     except Exception:
         abort(404)
+    return jsonify(data)
+
+
+@app.get('/api/all-topics-doc-counts')
+def all_topics_doc_counts():
+    """返回所有主题的文献数量统计（全部年份）。"""
+    svc = TopicService.get_instance()
+    data = svc.get_all_topics_doc_counts()
+    return jsonify(data)
+
+
+@app.get('/api/topic-all-years/<int:topic_id>')
+def topic_all_years(topic_id: int):
+    """返回某一主题所有年份的数据。"""
+    svc = TopicService.get_instance()
+    data = svc.get_topic_all_years_data(topic_id)
+    return jsonify(data)
+
+
+@app.get('/api/year-all-topics/<int:year>')
+def year_all_topics(year: int):
+    """返回某一年份所有主题的文献数量统计。"""
+    svc = TopicService.get_instance()
+    data = svc.get_year_all_topics_doc_counts(year)
+    return jsonify(data)
+
+
+@app.get('/api/keywords/all-topics-all-years')
+def keywords_all_topics_all_years():
+    """返回全部主题+全部年份的关键词（Top 50）。"""
+    svc = TopicService.get_instance()
+    data = svc.get_keywords_all_topics_all_years()
+    return jsonify(data)
+
+
+@app.get('/api/keywords/all-topics-year/<int:year>')
+def keywords_all_topics_year(year: int):
+    """返回全部主题+某一年份的关键词（Top 50）。"""
+    svc = TopicService.get_instance()
+    data = svc.get_keywords_all_topics_year(year)
+    return jsonify(data)
+
+
+@app.get('/api/keywords/topic-all-years/<int:topic_id>')
+def keywords_topic_all_years(topic_id: int):
+    """返回某一主题+全部年份的关键词（Top 50）。"""
+    svc = TopicService.get_instance()
+    data = svc.get_keywords_topic_all_years(topic_id)
+    return jsonify(data)
+
+
+@app.get('/api/keywords/topic-year/<int:topic_id>/<int:year>')
+def keywords_topic_year(topic_id: int, year: int):
+    """返回某一主题+某一年份的关键词（Top 50）。"""
+    svc = TopicService.get_instance()
+    data = svc.get_keywords_topic_year(topic_id, year)
     return jsonify(data)
 
 

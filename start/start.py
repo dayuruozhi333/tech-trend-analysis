@@ -145,7 +145,7 @@ def resolve_npm_command() -> str:
 
 def main() -> int:
     """总入口：安装依赖 -> 启动后端 -> 等待 -> 启动前端 -> 打开浏览器。"""
-    os.chdir(REPO_ROOT)
+    os.chdir(str(REPO_ROOT))
     print("[info] Repository root:", REPO_ROOT)
 
     try:
